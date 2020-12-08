@@ -99,7 +99,7 @@ func updateDNSRecord(newIP string, dnsData DNSData) error {
 	if err != nil {
 		return err
 	}
-	req.Header.Set("X-Auth-Email", "barrett370@gmail.com")
+	req.Header.Set("X-Auth-Email", AUTH_EMAIL)
 	req.Header.Set("X-Auth-Key", TOKEN)
 	req.Header.Set("Content-Type", "application/json")
 
