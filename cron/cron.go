@@ -5,21 +5,21 @@ import (
 	"log"
 	"os"
 	"time"
-)
 
-type WorkFunc func(*log.Logger) error
+	"github.com/barrett370/cloudflare_dynamicdns/workflow"
+)
 
 type Service struct {
 	logger *log.Logger
-	op     WorkFunc
+	op     workflow.Workflower
 	ticker *time.Ticker
 	done   chan struct{}
 }
 
-func New(name string, workFunc WorkFunc, interval time.Duration) *Service {
+func New(name string, wf workflow.Workflower, interval time.Duration) *Service {
 	return &Service{
 		logger: log.New(os.Stdout, fmt.Sprintf("[CRON: %s] ", name), log.Ldate|log.Ltime|log.Lshortfile|log.LUTC),
-		op:     workFunc,
+		op:     wf,
 		ticker: time.NewTicker(interval),
 		done:   make(chan struct{}),
 	}
@@ -40,7 +40,7 @@ func (s *Service) loop() {
 	for {
 		select {
 		case <-s.ticker.C:
-			err := s.op(s.logger)
+			err := s.op.Run(s.logger)
 			if err != nil {
 				s.logger.Printf("error while running work func. err: %v\n", err)
 			}

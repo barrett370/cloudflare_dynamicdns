@@ -12,6 +12,7 @@ import (
 	"github.com/barrett370/cloudflare_dynamicdns/cloudflare"
 	"github.com/barrett370/cloudflare_dynamicdns/cron"
 	"github.com/barrett370/cloudflare_dynamicdns/net"
+	"github.com/barrett370/cloudflare_dynamicdns/workflow"
 )
 
 type cfServicer interface {
@@ -68,24 +69,11 @@ func main() {
 	if err != nil {
 		log.Fatalf("error loading environment, %v", err)
 	}
-	cfService = cloudflare.New(CFAPIToken)
-	zones, err := cfService.ListZones()
+	syncWorkflow, err := workflow.NewCloudflareSyncWorkflow(CFAPIToken, CFZoneName)
 	if err != nil {
-		log.Fatalf("error getting zones, %v\n", err)
+		log.Fatal(err)
 	}
-	if len(zones) == 0 {
-		log.Fatal("no zones found")
-	}
-	for _, zone := range zones {
-		if zone.Name == CFZoneName {
-			cfZoneID = zone.ID
-			break
-		}
-	}
-	if cfZoneID == "" {
-		log.Fatalf("could not find zone matching zone name: %s\n", CFZoneName)
-	}
-	updateCron := cron.New(fmt.Sprintf("Cloudflare DynamicDNS Service [%s:%s]", CFZoneName, cfZoneID), updateDNSRecord, time.Second*time.Duration(CFIntervalSeconds))
+	updateCron := cron.New(fmt.Sprintf("Cloudflare DynamicDNS Service [%s:%s]", CFZoneName, cfZoneID), syncWorkflow, time.Second*time.Duration(CFIntervalSeconds))
 	updateCron.Start()
 	interruptC := make(chan os.Signal, 1)
 	signal.Notify(interruptC, os.Interrupt, syscall.SIGTERM)
