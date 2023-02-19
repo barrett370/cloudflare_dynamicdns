@@ -77,7 +77,6 @@ func main() {
 		log.Fatal("no zones found")
 	}
 	for _, zone := range zones {
-		fmt.Printf("zone: %s:%s\n", zone.ID, zone.Name)
 		if zone.Name == CFZoneName {
 			cfZoneID = zone.ID
 			break
