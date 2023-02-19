@@ -24,11 +24,7 @@ const addrIFConfig = "https://ifconfig.me/all.json"
 var _ json.Unmarshaler = &forwardedAddresses{}
 
 func (c *forwardedAddresses) UnmarshalJSON(bs []byte) (err error) {
-	var s string
-	err = json.Unmarshal(bs, &s)
-	if err != nil {
-		return
-	}
+	s := string(bs)
 	addrs := strings.Split(s, ",")
 	var cleanAddrs []string
 	for _, addr := range addrs {
