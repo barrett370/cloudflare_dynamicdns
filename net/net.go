@@ -6,17 +6,6 @@ import (
 	"strings"
 )
 
-// {
-//   "ip_addr": "90.222.128.101",
-//   "remote_host": "unavailable",
-//   "user_agent": "curl/7.74.0",
-//   "port": 44528,
-//   "method": "GET",
-//   "mime": "*/*",
-//   "via": "1.1 google",
-//   "forwarded": "90.222.128.101, 34.160.111.145,35.191.15.163"
-// }
-
 type forwardedAddresses []string
 
 type IPConfig struct {
