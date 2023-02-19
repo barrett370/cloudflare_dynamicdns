@@ -49,19 +49,19 @@ func NewCloudflareSyncWorkflow(cfAPIToken, cfZoneName string) (*CloudflareSyncWo
 func (w *CloudflareSyncWorkflow) Run(logger *log.Logger) (err error) {
 	var (
 		record    cloudflare.Record
-		currentIP net.IPConfig
+		currentIP string
 	)
 	record, err = w.cfService.GetDomainRecord(w.zoneID, w.zoneName)
 	if err != nil {
 		return err
 	}
-	currentIP, err = net.CurrentIP()
+	currentIP, err = net.CurrentIP(false)
 	if err != nil {
 		return err
 	}
-	if record.Content != currentIP.IPAddress {
-		logger.Printf("DNS record target does not match current IP, updating... \n record_target: %s, current_ip: %s\n", record.Content, currentIP.IPAddress)
-		return w.cfService.UpdateDNSRecordIP(record, currentIP.IPAddress)
+	if record.Content != currentIP {
+		logger.Printf("DNS record target does not match current IP, updating... \n record_target: %s, current_ip: %s\n", record.Content, currentIP)
+		return w.cfService.UpdateDNSRecordIP(record, currentIP)
 	} else {
 		logger.Println("IPs match, nothing to update")
 	}
