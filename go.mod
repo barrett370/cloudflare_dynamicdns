@@ -1,6 +1,6 @@
-module github.com/barrett370/wilverley-server/dynamic-dns
+module github.com/barrett370/cloudflare_dynamicdns
 
-go 1.13
+go 1.20
 
 require (
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
