@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/barrett370/cloudflare_dynamicdns/config"
-	"github.com/barrett370/cloudflare_dynamicdns/cron"
 	"github.com/barrett370/cloudflare_dynamicdns/workflow"
+	"github.com/barrett370/crongo"
 )
 
 var (
@@ -36,24 +36,24 @@ func parseEnvironment() error {
 	return err
 }
 
-func startUpdateCrons() (crons []*cron.Service) {
+func startUpdateCrons() (crons []*crongo.Scheduler) {
 	for _, zone := range config.Config.Cloudflare {
 		syncWorkflow, err := workflow.NewCloudflareSyncWorkflow(zone.Authentication.APIToken, zone.ZoneName)
 		if err != nil {
 			log.Fatal(err)
 		}
-		updateCron := cron.New(fmt.Sprintf("Cloudflare DynamicDNS Service [%s]", zone.ZoneName), syncWorkflow, time.Second*time.Duration(zone.IntervalSeconds))
+		updateCron := crongo.New(fmt.Sprintf("Cloudflare DynamicDNS Service [%s]", zone.ZoneName), syncWorkflow, time.Second*time.Duration(zone.IntervalSeconds))
 		updateCron.Start()
 		crons = append(crons, updateCron)
 	}
 	return
 }
 
-func stopUpdateCrons(crons []*cron.Service) {
+func stopUpdateCrons(crons []*crongo.Scheduler) {
 	var wg sync.WaitGroup
 	wg.Add(len(crons))
 	for _, c := range crons {
-		go func(c *cron.Service) {
+		go func(c *crongo.Scheduler) {
 			defer wg.Done()
 			c.Stop()
 		}(c)

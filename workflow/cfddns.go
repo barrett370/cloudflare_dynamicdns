@@ -1,9 +1,9 @@
 package workflow
 
 import (
+	"context"
 	"errors"
 	"fmt"
-	"log"
 
 	"github.com/barrett370/cloudflare_dynamicdns/cloudflare"
 	"github.com/barrett370/cloudflare_dynamicdns/net"
@@ -46,7 +46,7 @@ func NewCloudflareSyncWorkflow(cfAPIToken, cfZoneName string) (*CloudflareSyncWo
 	}, nil
 }
 
-func (w *CloudflareSyncWorkflow) Run(logger *log.Logger) (err error) {
+func (w *CloudflareSyncWorkflow) Run(ctx context.Context) (err error) {
 	var (
 		record    cloudflare.Record
 		currentIP string
@@ -60,10 +60,7 @@ func (w *CloudflareSyncWorkflow) Run(logger *log.Logger) (err error) {
 		return err
 	}
 	if record.Content != currentIP {
-		logger.Printf("DNS record target does not match current IP, updating... \n record_target: %s, current_ip: %s\n", record.Content, currentIP)
 		return w.cfService.UpdateDNSRecordIP(record, currentIP)
-	} else {
-		logger.Println("IPs match, nothing to update")
 	}
 	return
 }
