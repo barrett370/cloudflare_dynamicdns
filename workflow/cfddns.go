@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 
 	"github.com/barrett370/cloudflare_dynamicdns/cloudflare"
 	"github.com/barrett370/cloudflare_dynamicdns/net"
@@ -47,6 +48,7 @@ func NewCloudflareSyncWorkflow(cfAPIToken, cfZoneName string) (*CloudflareSyncWo
 }
 
 func (w *CloudflareSyncWorkflow) Run(ctx context.Context) (err error) {
+	log.Println("running cloudflare sync workflow")
 	var (
 		record    cloudflare.Record
 		currentIP string
@@ -62,5 +64,6 @@ func (w *CloudflareSyncWorkflow) Run(ctx context.Context) (err error) {
 	if record.Content != currentIP {
 		return w.cfService.UpdateDNSRecordIP(record, currentIP)
 	}
+	log.Println("successfully completed cloudflare sync workflow")
 	return
 }
